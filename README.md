@@ -53,7 +53,7 @@ Add your deployed website link here.
 Example:
 
 ```txt
-https://yourusername.github.io/portfolio
+https://Krishnajith-C-Vinod.github.io/portfolio
 ```
 
 ---
