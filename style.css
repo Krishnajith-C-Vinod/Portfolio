@@ -54,6 +54,7 @@ body::after {
   color: #c084fc;
   letter-spacing: 4px;
   font-size: 1rem;
+  text-align: center;
 }
 
 .quantum-core {
@@ -89,6 +90,7 @@ nav {
   align-items: center;
   backdrop-filter: blur(15px);
   z-index: 1000;
+  background: rgba(0,0,0,0.25);
 }
 
 .logo {
@@ -137,6 +139,7 @@ nav a:hover {
   font-size: 6rem;
   line-height: 1;
   font-weight: 900;
+  word-break: break-word;
 }
 
 .hero h1 span {
@@ -192,6 +195,7 @@ nav a:hover {
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 30px;
   backdrop-filter: blur(20px);
+  overflow: hidden;
 }
 
 .glass-section h2,
@@ -206,6 +210,7 @@ nav a:hover {
   line-height: 1.9;
   margin-bottom: 25px;
   font-size: 1.05rem;
+  word-break: break-word;
 }
 
 .cards {
@@ -245,6 +250,8 @@ nav a:hover {
   border-radius: 30px;
   padding: 40px;
   margin-bottom: 40px;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .publication-card .year {
@@ -256,6 +263,7 @@ nav a:hover {
 .publication-card h3 {
   font-size: 2rem;
   margin-bottom: 20px;
+  line-height: 1.4;
 }
 
 .publication-card p {
@@ -270,6 +278,7 @@ nav a:hover {
   background: #8b5cf6;
   padding: 14px 28px;
   border-radius: 12px;
+  display: inline-block;
 }
 
 .timeline {
@@ -328,31 +337,113 @@ footer {
   padding: 40px;
   text-align: center;
   color: #7d7d7d;
+  line-height: 1.8;
 }
+
+/* MOBILE RESPONSIVE */
 
 @media(max-width: 768px) {
 
   nav {
     padding: 20px;
+    flex-direction: column;
+    gap: 15px;
   }
 
   nav ul {
-    display: none;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero {
+    padding-top: 120px;
   }
 
   .hero h1 {
-    font-size: 3.5rem;
+    font-size: 3rem;
+    line-height: 1.2;
+  }
+
+  .tag {
+    letter-spacing: 3px;
+    font-size: 0.8rem;
+  }
+
+  .description {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
   }
 
   .glass-section {
     width: 92%;
-    padding: 40px 25px;
+    padding: 35px 20px;
   }
 
   .glass-section h2,
   .section-title,
   .quote-section h2 {
     font-size: 2rem;
+    line-height: 1.4;
+  }
+
+  .cards {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 25px;
+  }
+
+  .publication-card {
+    width: 100%;
+    padding: 25px 20px;
+  }
+
+  .publication-card h3 {
+    font-size: 1.4rem;
+    line-height: 1.5;
+  }
+
+  .publication-card p {
+    font-size: 0.95rem;
+    line-height: 1.8;
+  }
+
+  .timeline {
+    width: 100%;
+  }
+
+  .quote-section {
+    padding: 120px 20px;
+  }
+
+  .contact-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .contact-links a {
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
+  }
+
+  footer {
+    padding: 30px 20px;
   }
 
 }
