@@ -48,10 +48,6 @@ arXiv: https://arxiv.org/abs/2605.16467
 
 ## Live Website
 
-Add your deployed website link here.
-
-Example:
-
 ```txt
 https://Krishnajith-C-Vinod.github.io/portfolio
 ```
