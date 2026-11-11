@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=3" />
 
   <!-- Three.js (loaded from CDN, no build step needed for GitHub Pages) -->
   <script type="importmap">
@@ -106,6 +106,7 @@
     <a href="#home" data-nav="home"><svg><use href="#i-home"/></svg><span>Home</span></a>
     <a href="#about" data-nav="about"><svg><use href="#i-user"/></svg><span>About Me</span></a>
     <a href="#research" data-nav="research"><svg><use href="#i-atom"/></svg><span>Research</span></a>
+    <a href="#ailab" data-nav="ailab"><svg><use href="#i-brain"/></svg><span>AI Lab</span></a>
     <a href="#bandlab" data-nav="bandlab"><svg><use href="#i-lattice"/></svg><span>Band Lab</span></a>
     <a href="#group" data-nav="group"><svg><use href="#i-group"/></svg><span>Group</span></a>
     <a href="#publications" data-nav="publications"><svg><use href="#i-book"/></svg><span>Publications</span></a>
@@ -245,7 +246,7 @@
       <article class="panel tilt reveal interests-panel">
         <header class="panel-head"><svg class="ph-icon pink"><use href="#i-spark"/></svg><h2>Interests</h2></header>
         <div class="interests">
-          <div class="interest"><span class="in-ic sky"><svg><use href="#i-telescope"/></svg></span><span>Astrophysics &amp;<br>Relativity</span></div>
+          <div class="interest"><span class="in-ic sky"><svg><use href="#i-atom"/></svg></span><span>Physics</span></div>
           <div class="interest"><span class="in-ic mint"><svg><use href="#i-code"/></svg></span><span>Programming<br>&amp; AI</span></div>
           <div class="interest"><span class="in-ic peach"><svg><use href="#i-cube"/></svg></span><span>3D Design<br>(Blender)</span></div>
           <div class="interest"><span class="in-ic pink"><svg><use href="#i-game"/></svg></span><span>Game Dev<br>(Unity)</span></div>
@@ -278,29 +279,90 @@
           <div class="r-ic"><svg><use href="#i-lattice"/></svg></div>
           <h3>Theoretical Condensed Matter</h3>
           <p>Lattice models, electronic band structure, symmetry breaking and emergent collective excitations in correlated and ordered phases of matter.</p>
-          <ul class="chips"><li>tight-binding</li><li>spin models</li><li>phase transitions</li></ul>
         </article>
 
         <article class="r-card tilt reveal" style="--c:var(--sky)">
           <div class="r-ic"><svg><use href="#i-brain"/></svg></div>
           <h3>Machine Learning for Materials</h3>
           <p>Learning structure → property maps: predicting electronic, optical and functional response of materials directly from crystal structures, spectra and images.</p>
-          <ul class="chips"><li>materials informatics</li><li>deep learning</li><li>spectra</li></ul>
         </article>
 
         <article class="r-card tilt reveal" style="--c:var(--peach)">
           <div class="r-ic"><svg><use href="#i-sigma"/></svg></div>
           <h3>AI for Physics Discovery</h3>
           <p>Interpretable models and symbolic regression that recover physical laws from data, and testing whether learning systems can reason about physics beyond what they were trained on.</p>
-          <ul class="chips"><li>symbolic regression</li><li>interpretability</li><li>causality</li></ul>
         </article>
 
         <article class="r-card tilt reveal" style="--c:var(--pink)">
           <div class="r-ic"><svg><use href="#i-server"/></svg></div>
           <h3>Computational &amp; Data-Driven Physics</h3>
           <p>Numerical simulation, curated datasets and HPC workflows that connect theory, computation and experiment.</p>
-          <ul class="chips"><li>simulation</li><li>HPC</li><li>scientific software</li></ul>
         </article>
+      </div>
+    </section>
+
+    <!-- ============ AI LAB (interactive neural network) ============ -->
+    <section id="ailab" class="block" data-section="ailab">
+      <div class="lab ai-lab panel reveal">
+        <div class="lab-copy">
+          <p class="kicker">02 — Interactive</p>
+          <h2>Neural Network <span class="grad">Lab</span></h2>
+          <p>
+            A small neural network that trains live in your browser. Watch it learn a phase boundary from
+            labelled samples. Click the map to add points (<em>shift-click</em> or <em>right-click</em> for the other class), and
+            hover over it to see how every neuron in the 3D network responds.
+          </p>
+
+          <div class="lab-controls">
+            <div class="seg" aria-label="Dataset">
+              <button class="seg-btn active" data-data="phase">Phase map</button>
+              <button class="seg-btn" data-data="circle">Circle</button>
+              <button class="seg-btn" data-data="xor">XOR</button>
+              <button class="seg-btn" data-data="spiral">Spiral</button>
+            </div>
+
+            <label class="slider">
+              <span>Hidden layers <output id="layersOut">2</output></span>
+              <input type="range" id="layersSlider" min="1" max="3" step="1" value="2" />
+            </label>
+            <label class="slider">
+              <span>Neurons per layer <output id="neuronsOut">6</output></span>
+              <input type="range" id="neuronsSlider" min="2" max="10" step="1" value="6" />
+            </label>
+            <label class="slider">
+              <span>Learning rate <output id="lrOut">0.030</output></span>
+              <input type="range" id="lrSlider" min="-3" max="-1" step="0.05" value="-1.52" />
+            </label>
+
+            <div class="ai-btns">
+              <button class="mini-btn primary" id="aiPlay">Pause</button>
+              <button class="mini-btn" id="aiReset">Reset weights</button>
+              <button class="mini-btn" id="aiClear">Clear points</button>
+            </div>
+          </div>
+
+          <div class="readout">
+            <div><span>Epoch</span><b id="aiEpoch">0</b></div>
+            <div><span>Loss</span><b id="aiLoss">—</b></div>
+            <div><span>Accuracy</span><b id="aiAcc">—</b></div>
+          </div>
+          <canvas id="lossSpark" aria-label="Training loss curve"></canvas>
+        </div>
+
+        <div class="ai-stage">
+          <div class="heat-wrap">
+            <canvas id="heatCanvas" aria-label="Decision map: click to add training points"></canvas>
+            <span class="ax ax-x" id="axX">field h →</span>
+            <span class="ax ax-y" id="axY">temperature T →</span>
+            <div class="legend"><span class="lg lg-b" id="lgB">Ordered</span><span class="lg lg-a" id="lgA">Disordered</span></div>
+            <span class="probe-out" id="probeOut"></span>
+          </div>
+          <div class="net-wrap">
+            <canvas id="netCanvas" aria-label="3D view of the neural network"></canvas>
+            <div class="net-key"><span class="k-pos">+ weight</span><span class="k-neg">− weight</span></div>
+            <span class="stage-tag">live network · drag to rotate</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -308,7 +370,7 @@
     <section id="bandlab" class="block" data-section="bandlab">
       <div class="lab panel reveal">
         <div class="lab-copy">
-          <p class="kicker">02 — Interactive</p>
+          <p class="kicker">03 — Interactive</p>
           <h2>Band Structure <span class="grad">Lab</span></h2>
           <p>
             A live tight-binding calculation. Drag to rotate and hover over the surface to read
@@ -357,7 +419,7 @@
           <canvas id="clusterCanvas" aria-label="Rotating 3D atomic cluster"></canvas>
         </div>
         <div class="group-copy">
-          <p class="kicker">03 — Research Group</p>
+          <p class="kicker">04 — Research Group</p>
           <h2><span class="grad">Teraqata</span> · IIT Madras</h2>
           <p>
             I'm a PhD scholar in <strong>Teraqata</strong>, the research group led by
@@ -378,7 +440,7 @@
     <!-- ============ PUBLICATIONS ============ -->
     <section id="publications" class="block" data-section="publications">
       <div class="block-head reveal">
-        <p class="kicker">04 — Highlighted Work</p>
+        <p class="kicker">05 — Highlighted Work</p>
         <h2>Publications &amp; <span class="grad">Projects</span></h2>
       </div>
 
@@ -408,7 +470,7 @@
     <!-- ============ ACHIEVEMENTS ============ -->
     <section id="achievements" class="block" data-section="achievements">
       <div class="block-head reveal">
-        <p class="kicker">05 — Milestones</p>
+        <p class="kicker">06 — Milestones</p>
         <h2>Achievements</h2>
       </div>
 
@@ -448,7 +510,7 @@
     <section id="contact" class="block" data-section="contact">
       <div class="contact panel reveal">
         <div>
-          <p class="kicker">06 — Contact</p>
+          <p class="kicker">07 — Contact</p>
           <h2>Let's <span class="grad">connect</span></h2>
           <p>Open to collaborations, discussions on condensed matter &amp; ML, and outreach.</p>
           <a class="mail-big" href="mailto:krishnajithcvinod7@gmail.com"><svg><use href="#i-mail"/></svg>krishnajithcvinod7@gmail.com</a>
@@ -472,7 +534,7 @@
   <!-- mobile menu -->
   <div class="mobile-menu" hidden>
     <a href="#home">Home</a><a href="#about">About</a><a href="#research">Research</a>
-    <a href="#bandlab">Band Lab</a><a href="#group">Group</a><a href="#publications">Publications</a>
+    <a href="#ailab">AI Lab</a><a href="#bandlab">Band Lab</a><a href="#group">Group</a><a href="#publications">Publications</a>
     <a href="#achievements">Achievements</a><a href="#contact">Contact</a>
     <button class="theme-toggle-m">Toggle theme</button>
   </div>
@@ -481,6 +543,6 @@
   <script>
     setTimeout(function () { document.body.classList.add('loaded'); }, 4000);
   </script>
-  <script type="module" src="script.js"></script>
+  <script type="module" src="script.js?v=3"></script>
 </body>
 </html>
