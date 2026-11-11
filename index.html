@@ -1,235 +1,486 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Krishnajith C Vinod | Portfolio</title>
-
-  <link rel="stylesheet" href="style.css" />
+  <title>Krishnajith C Vinod | Condensed Matter × Machine Learning</title>
+  <meta name="description" content="Krishnajith C Vinod — PhD scholar in Physics at IIT Madras (Teraqata group). Theoretical condensed matter physics and machine learning." />
+  <meta name="theme-color" content="#0a0f1f" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Three.js (loaded from CDN, no build step needed for GitHub Pages) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
 
-  <!-- LOADER -->
-  <div id="loader">
-    <div class="quantum-core"></div>
-    <h1>Welcome Dreamer...</h1>
+  <!-- ============ ICON SPRITE ============ -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+      <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 9v6"/></symbol>
+      <symbol id="i-atom" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></symbol>
+      <symbol id="i-lattice" viewBox="0 0 24 24"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M12 12 21 7M12 12 3 7M12 12v10"/></symbol>
+      <symbol id="i-group" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/><circle cx="17.5" cy="9" r="2.6"/><path d="M17 14.2c2.9.3 5 2.3 5 5.3"/></symbol>
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M8 7h8M8 11h6"/></symbol>
+      <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H3v1a4 4 0 0 0 4 4M17 6h4v1a4 4 0 0 1-4 4"/><path d="M12 14v4M8 21h8M9 18h6v3H9z"/></symbol>
+      <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m3 6 9 7 9-7"/></symbol>
+      <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></symbol>
+      <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 3h7v7"/><path d="M21 3l-9 9"/><path d="M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M1.5 12H4M20 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></symbol>
+      <symbol id="i-telescope" viewBox="0 0 24 24"><path d="m3 13 12-6 2 4-12 6z"/><path d="m15 7 4-2 2 4-4 2"/><path d="M9 16l-3 6M11 15l3 7"/></symbol>
+      <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+      <symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></symbol>
+      <symbol id="i-game" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="16" cy="11.5" r=".9"/><circle cx="18" cy="13.8" r=".9"/></symbol>
+      <symbol id="i-chip" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+      <symbol id="i-brain" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 6.8l3.3 4M7 17.2l3.3-4M13.7 10.8 17 6.8M13.7 13.2l3.3 4"/></symbol>
+      <symbol id="i-sigma" viewBox="0 0 24 24"><path d="M18 4H6l7 8-7 8h12"/></symbol>
+      <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01"/></symbol>
+      <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></symbol>
+      <symbol id="i-linkedin" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></symbol>
+      <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
+      <symbol id="i-youtube" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><path d="M9.75 15.02 15.5 11.75 9.75 8.48z"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3.5 3.5M15.5 15.5 19 19M5 19l3.5-3.5M15.5 8.5 19 5"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ============ LOADER ============ -->
+  <div id="loader" aria-hidden="true">
+    <div class="loader-cube">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <p>assembling the lattice<span class="dots"></span></p>
   </div>
 
-  <!-- PARTICLES -->
-  <div class="particles"></div>
+  <!-- ============ 3D BACKGROUND ============ -->
+  <canvas id="bg3d" aria-hidden="true"></canvas>
+  <div class="bg-glow" aria-hidden="true"></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
 
-  <!-- NAVBAR -->
-  <nav>
-    <div class="logo">Welcome</div>
+  <!-- ============ TOP NAV ============ -->
+  <header class="topbar">
+    <a href="#home" class="brand" aria-label="Home">
+      <span class="brand-mark">
+        <span class="orbit o1"></span><span class="orbit o2"></span><span class="nucleus"></span>
+      </span>
+      <span class="brand-text">KCV</span>
+    </a>
 
-    <ul>
-      <li><a href="#about">About</a></li>
-      <li><a href="https://drive.google.com/file/d/1XDK8ZGI3fp2ggWJ4524LQIzDqTcjYsyJ/view?usp=sharing">CV</a></li>
-      <li><a href="#research">Research</a></li>
-      <li><a href="#publication">Publication</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
+    <nav class="toplinks" aria-label="Primary">
+      <a href="#home" data-nav="home">Home</a>
+      <a href="#about" data-nav="about">About</a>
+      <a href="#research" data-nav="research">Research</a>
+      <a href="#group" data-nav="group">Group</a>
+      <a href="#publications" data-nav="publications">Publications</a>
+      <a href="https://drive.google.com/file/d/1XDK8ZGI3fp2ggWJ4524LQIzDqTcjYsyJ/view?usp=sharing" target="_blank" rel="noopener">CV</a>
+    </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <p class="tag">Physicist • Researcher • Teacher</p>
-
-      <h1>
-        Krishnajith
-        <span>C Vinod</span>
-      </h1>
-
-      <p class="description">
-        Exploring the intersection of quantum information, machine learning,
-        emergent computation, and intelligent systems.
-      </p>
-
-      <div class="buttons">
-        <a href="https://youtube.com/KrishnajithCVinod" target="_blank" class="secondary-btn">Youtube</a>
-        <a href="#research" class="primary-btn">Explore Research</a>
-        <a href="https://github.com/Krishnajith-C-Vinod" target="_blank" class="secondary-btn">GitHub</a>
-      </div>
+    <div class="top-actions">
+      <a class="icon-btn" href="https://github.com/Krishnajith-C-Vinod" target="_blank" rel="noopener" aria-label="GitHub"><svg><use href="#i-github"/></svg></a>
+      <a class="icon-btn" href="https://in.linkedin.com/in/krishnajith-c-vinod" target="_blank" rel="noopener" aria-label="LinkedIn"><svg><use href="#i-linkedin"/></svg></a>
+      <a class="icon-btn" href="https://www.instagram.com/krishnajith_c_vinod" target="_blank" rel="noopener" aria-label="Instagram"><svg><use href="#i-instagram"/></svg></a>
+      <a class="icon-btn" href="https://youtube.com/KrishnajithCVinod" target="_blank" rel="noopener" aria-label="YouTube"><svg><use href="#i-youtube"/></svg></a>
+      <a class="contact-btn" href="#contact">Contact <svg><use href="#i-mail"/></svg></a>
+      <button class="icon-btn menu-btn" aria-label="Open menu" aria-expanded="false"><svg><use href="#i-menu"/></svg></button>
     </div>
-  </section>
+  </header>
 
-  <!-- ABOUT -->
-  <section id="about" class="glass-section">
-    <h2>About Me</h2>
+  <!-- ============ SIDE RAIL ============ -->
+  <aside class="siderail" aria-label="Sections">
+    <a href="#home" data-nav="home"><svg><use href="#i-home"/></svg><span>Home</span></a>
+    <a href="#about" data-nav="about"><svg><use href="#i-user"/></svg><span>About Me</span></a>
+    <a href="#research" data-nav="research"><svg><use href="#i-atom"/></svg><span>Research</span></a>
+    <a href="#bandlab" data-nav="bandlab"><svg><use href="#i-lattice"/></svg><span>Band Lab</span></a>
+    <a href="#group" data-nav="group"><svg><use href="#i-group"/></svg><span>Group</span></a>
+    <a href="#publications" data-nav="publications"><svg><use href="#i-book"/></svg><span>Publications</span></a>
+    <a href="#achievements" data-nav="achievements"><svg><use href="#i-trophy"/></svg><span>Achievements</span></a>
+    <a href="#contact" data-nav="contact"><svg><use href="#i-mail"/></svg><span>Contact</span></a>
 
-    <p>
-      I am from Kozhikode, Kerala, India. I completed my BSc in Physics from Zamorins Guruvayurappan College and later pursued my MSc in Physics at Government Arts and Science College Meenchanda, where I graduated as the First Rank Holder under the University of Calicut in 2025. I am currently pursuing my PhD in Physics at Indian Institute of Technology Madras.
-    </p>
+    <button class="theme-toggle" aria-label="Toggle light / dark theme">
+      <span class="tt-knob"></span>
+      <svg class="tt-moon"><use href="#i-moon"/></svg>
+      <svg class="tt-sun"><use href="#i-sun"/></svg>
+    </button>
+  </aside>
 
-    <p>
-      My research interests revolve around quantum information science, intelligent systems, and emergent computation. I work on adaptive quantum teleportation protocols, quantum machine learning, quantum neural networks, and unconventional computational structures inspired by quantum mechanics. I am particularly interested in exploring how quantum systems can be utilized for intelligent information processing under realistic noisy environments and how new computational paradigms may emerge beyond conventional approaches.
-    </p>
-    <p>
-        Driven by curiosity and foundational inquiry, I aim to explore the deeper connections between quantum mechanics, computation, and intelligence while studying how quantum systems can transform information processing and intelligent behavior. Alongside research, I also enjoy scientific outreach, explaining complex physics concepts in intuitive ways, and working on educational demonstrations related to quantum mechanics.
-    </p>
-  </section>
+  <main>
 
-  
+    <!-- ============ HERO ============ -->
+    <section id="home" class="hero" data-section="home">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="pulse-dot"></span> PhD Scholar · Teraqata Group · IIT Madras</p>
 
-  <!-- RESEARCH -->
-  <section id="research">
-    <h2 class="section-title">Research Interests</h2>
+        <h1 class="hero-name">
+          Krishnajith <span class="grad">C Vinod</span>
+        </h1>
 
-    <div class="cards">
-
-      <div class="card">
-        <h3>Quantum Information Science</h3>
-        <p>
-          Exploring teleportation protocols, quantum communication,
-          quantum channels, and information dynamics.
+        <p class="hero-role">
+          <span class="role-static">Working on</span>
+          <span class="role-rotator" aria-live="polite">Theoretical Condensed Matter</span>
         </p>
+
+        <ul class="hero-tags">
+          <li>Condensed Matter Theory</li>
+          <li>Machine Learning</li>
+          <li>Materials Informatics</li>
+          <li>Computational Physics</li>
+        </ul>
+
+        <p class="hero-desc">
+          A physicist exploring how collective behaviour emerges in materials, and how machine
+          learning can learn, predict and help discover that physics, with a habit of building
+          the tools along the way.
+        </p>
+
+        <div class="hero-buttons">
+          <a class="btn btn-primary" href="https://drive.google.com/file/d/1XDK8ZGI3fp2ggWJ4524LQIzDqTcjYsyJ/view?usp=sharing" target="_blank" rel="noopener">View CV <svg><use href="#i-download"/></svg></a>
+          <a class="btn btn-ghost" href="#contact">Get in Touch <svg><use href="#i-mail"/></svg></a>
+          <a class="btn btn-ghost" href="#research">Explore Research <svg><use href="#i-arrow"/></svg></a>
         </div>
-
-      <div class="card">
-        <h3>Quantum Machine Learning</h3>
-        <p>
-          Investigating adaptive learning systems integrating
-          quantum mechanics and intelligent computation.
-        </p>
       </div>
 
-      <div class="card">
-        <h3>Quantum Neural Networks</h3>
-        <p>
-          Designing nonlinear emergent architectures for
-          next-generation computational paradigms.
-        </p>
+      <!-- floating holographic equation board (CSS 3D) -->
+      <div class="holo-board" aria-hidden="true">
+        <div class="holo-inner">
+          <p class="holo-label">// model Hamiltonian</p>
+          <p class="eq">Ĥ = −t Σ<sub>⟨ij⟩</sub> c<sup>†</sup><sub>i</sub>c<sub>j</sub> + U Σ<sub>i</sub> n<sub>i↑</sub>n<sub>i↓</sub></p>
+          <p class="eq small">Ĥ<sub>spin</sub> = J Σ<sub>⟨ij⟩</sub> <b>S</b><sub>i</sub>·<b>S</b><sub>j</sub></p>
+          <div class="holo-line"></div>
+          <p class="holo-label">// learned map</p>
+          <p class="eq small">f<sub>θ</sub> : structure → property</p>
+          <p class="eq small">ℒ(θ) = ‖ y − f<sub>θ</sub>(x) ‖² + λ‖θ‖²</p>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>Condensed Matter Physics</h3>
+      <p class="hero-hint"><svg><use href="#i-spark"/></svg> Click the crystal to launch a spin wave · move your cursor to tilt it</p>
+
+      <a href="#about" class="scroll-cue" aria-label="Scroll down"><span></span></a>
+    </section>
+
+    <!-- ============ DASHBOARD (About / Education / Skills / Interests) ============ -->
+    <section id="about" class="dash" data-section="about">
+
+      <article class="panel tilt reveal about-panel">
+        <header class="panel-head"><svg class="ph-icon mint"><use href="#i-user"/></svg><h2>About Me</h2></header>
         <p>
-          Studying collective quantum behavior and emergent
-          phenomena in complex systems.
+          I'm from Kozhikode, Kerala, and a PhD scholar in Physics at the
+          <strong>Indian Institute of Technology Madras</strong>, where I'm part of
+          <a href="https://www.teraqata.com/group-members" target="_blank" rel="noopener">Teraqata</a>,
+          Dr. Ayana Ghosh's research group.
         </p>
+        <p>
+          My research sits where <strong>theoretical condensed matter physics</strong> meets
+            <strong>machine learning</strong>. I'm interested in how order, symmetry breaking and
+            collective excitations emerge from microscopic models, and in how data-driven methods can
+            learn structure–property relationships, predict the response of materials and help uncover
+          interpretable physical laws.
+        </p>
+        <div class="more" id="aboutMore">
+          <p>
+            Before this, I worked in quantum information, building machine-learned adaptive teleportation
+            protocols for noisy channels. Combining physical models with learning algorithms in that work
+            now shapes how I approach materials and many-body problems.
+          </p>
+          <p>
+            Alongside research, I enjoy scientific outreach: explaining hard physics intuitively, and
+            building visual, interactive science experiences in code, 3D and electronics.
+          </p>
+        </div>
+        <button class="link-btn" data-toggle="aboutMore">Read more <svg><use href="#i-arrow"/></svg></button>
+        <div class="wave-deco" aria-hidden="true"></div>
+      </article>
+
+      <article class="panel tilt reveal edu-panel">
+        <header class="panel-head"><svg class="ph-icon sky"><use href="#i-cap"/></svg><h2>Education</h2></header>
+        <ol class="edu">
+          <li>
+            <span class="edu-dot mint"></span>
+            <h3>PhD in Physics</h3>
+            <p>Indian Institute of Technology Madras · <em>2026 – Present</em></p>
+          </li>
+          <li>
+            <span class="edu-dot peach"></span>
+            <h3>MSc in Physics</h3>
+            <p>Govt. Arts &amp; Science College, Meenchanda · University of Calicut · <em>2023 – 2025</em></p>
+            <span class="badge"><svg><use href="#i-trophy"/></svg> First Rank Holder (2025)</span>
+          </li>
+          <li>
+            <span class="edu-dot pink"></span>
+            <h3>BSc in Physics</h3>
+            <p>Zamorins Guruvayurappan College, Kozhikode</p>
+          </li>
+        </ol>
+      </article>
+
+      <article class="panel tilt reveal skills-panel">
+        <header class="panel-head"><svg class="ph-icon peach"><use href="#i-code"/></svg><h2>Skills &amp; Tools</h2></header>
+        <div class="skills">
+          <div class="skill" style="--c:var(--sky)"><span class="sk-ic">Py</span><span>Python</span></div>
+          <div class="skill" style="--c:var(--peach)"><span class="sk-ic">PT</span><span>PyTorch</span></div>
+          <div class="skill" style="--c:var(--mint)"><span class="sk-ic">np</span><span>NumPy</span></div>
+          <div class="skill" style="--c:var(--lemon)"><span class="sk-ic"><svg><use href="#i-server"/></svg></span><span>HPC · SLURM</span></div>
+          <div class="skill" style="--c:var(--coral)"><span class="sk-ic"><svg><use href="#i-cube"/></svg></span><span>Blender</span></div>
+          <div class="skill" style="--c:var(--lilac)"><span class="sk-ic"><svg><use href="#i-game"/></svg></span><span>Unity</span></div>
+          <div class="skill" style="--c:var(--mint)"><span class="sk-ic"><svg><use href="#i-chip"/></svg></span><span>Arduino</span></div>
+          <div class="skill" style="--c:var(--pink)"><span class="sk-ic">&lt;/&gt;</span><span>Web · 3D</span></div>
+        </div>
+      </article>
+
+      <article class="panel tilt reveal interests-panel">
+        <header class="panel-head"><svg class="ph-icon pink"><use href="#i-spark"/></svg><h2>Interests</h2></header>
+        <div class="interests">
+          <div class="interest"><span class="in-ic sky"><svg><use href="#i-telescope"/></svg></span><span>Astrophysics &amp;<br>Relativity</span></div>
+          <div class="interest"><span class="in-ic mint"><svg><use href="#i-code"/></svg></span><span>Programming<br>&amp; AI</span></div>
+          <div class="interest"><span class="in-ic peach"><svg><use href="#i-cube"/></svg></span><span>3D Design<br>(Blender)</span></div>
+          <div class="interest"><span class="in-ic pink"><svg><use href="#i-game"/></svg></span><span>Game Dev<br>(Unity)</span></div>
+          <div class="interest"><span class="in-ic lemon"><svg><use href="#i-chip"/></svg></span><span>Electronics<br>(Arduino)</span></div>
+        </div>
+      </article>
+
+      <article class="panel tilt reveal links-panel">
+        <header class="panel-head"><svg class="ph-icon lemon"><use href="#i-ext"/></svg><h2>Quick Links</h2></header>
+        <ul class="quick">
+          <li><a href="#publications"><svg><use href="#i-book"/></svg>Publications<svg class="qe"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="https://arxiv.org/abs/2605.16467" target="_blank" rel="noopener"><svg><use href="#i-file"/></svg>arXiv: 2605.16467<svg class="qe"><use href="#i-ext"/></svg></a></li>
+          <li><a href="https://www.teraqata.com/group-members" target="_blank" rel="noopener"><svg><use href="#i-group"/></svg>Teraqata Group<svg class="qe"><use href="#i-ext"/></svg></a></li>
+          <li><a href="https://drive.google.com/file/d/1XDK8ZGI3fp2ggWJ4524LQIzDqTcjYsyJ/view?usp=sharing" target="_blank" rel="noopener"><svg><use href="#i-download"/></svg>CV (PDF)<svg class="qe"><use href="#i-ext"/></svg></a></li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ============ RESEARCH ============ -->
+    <section id="research" class="block" data-section="research">
+      <div class="block-head reveal">
+        <p class="kicker">01 — Research</p>
+        <h2>Where many-body physics<br><span class="grad">meets machine learning</span></h2>
+        <p class="lede">My interests span analytical and computational condensed matter theory and the
+          machine-learning methods that are changing how we study materials.</p>
       </div>
 
-    </div>
-  </section>
+      <div class="r-cards">
+        <article class="r-card tilt reveal" style="--c:var(--mint)">
+          <div class="r-ic"><svg><use href="#i-lattice"/></svg></div>
+          <h3>Theoretical Condensed Matter</h3>
+          <p>Lattice models, electronic band structure, symmetry breaking and emergent collective excitations in correlated and ordered phases of matter.</p>
+          <ul class="chips"><li>tight-binding</li><li>spin models</li><li>phase transitions</li></ul>
+        </article>
 
-  <!-- PUBLICATION -->
-  <section id="publication" class="glass-section">
+        <article class="r-card tilt reveal" style="--c:var(--sky)">
+          <div class="r-ic"><svg><use href="#i-brain"/></svg></div>
+          <h3>Machine Learning for Materials</h3>
+          <p>Learning structure → property maps: predicting electronic, optical and functional response of materials directly from crystal structures, spectra and images.</p>
+          <ul class="chips"><li>materials informatics</li><li>deep learning</li><li>spectra</li></ul>
+        </article>
 
-    <h2>Featured Publication</h2>
+        <article class="r-card tilt reveal" style="--c:var(--peach)">
+          <div class="r-ic"><svg><use href="#i-sigma"/></svg></div>
+          <h3>AI for Physics Discovery</h3>
+          <p>Interpretable models and symbolic regression that recover physical laws from data, and testing whether learning systems can reason about physics beyond what they were trained on.</p>
+          <ul class="chips"><li>symbolic regression</li><li>interpretability</li><li>causality</li></ul>
+        </article>
 
-    <div class="publication-card">
-      <p class="year">2026</p>
+        <article class="r-card tilt reveal" style="--c:var(--pink)">
+          <div class="r-ic"><svg><use href="#i-server"/></svg></div>
+          <h3>Computational &amp; Data-Driven Physics</h3>
+          <p>Numerical simulation, curated datasets and HPC workflows that connect theory, computation and experiment.</p>
+          <ul class="chips"><li>simulation</li><li>HPC</li><li>scientific software</li></ul>
+        </article>
+      </div>
+    </section>
 
-      <h3>
-        Beyond Bell Teleportation: Machine-Learned Adaptive Protocols
-      </h3>
+    <!-- ============ BAND LAB (interactive 3D) ============ -->
+    <section id="bandlab" class="block" data-section="bandlab">
+      <div class="lab panel reveal">
+        <div class="lab-copy">
+          <p class="kicker">02 — Interactive</p>
+          <h2>Band Structure <span class="grad">Lab</span></h2>
+          <p>
+            A live tight-binding calculation. Drag to rotate and hover over the surface to read
+            the energy <em>E(k)</em>. Open a mass gap at graphene's Dirac points, or switch lattices.
+          </p>
 
-      <p>
-        Machine-learned adaptive quantum teleportation protocols under noisy environments with optimized fidelity enhancement strategies.
-      </p>
+          <div class="lab-controls">
+            <div class="seg" role="tablist" aria-label="Lattice">
+              <button class="seg-btn active" data-model="graphene">Honeycomb</button>
+              <button class="seg-btn" data-model="square">Square</button>
+              <button class="seg-btn" data-model="triangular">Triangular</button>
+            </div>
 
-      <a href="https://arxiv.org/abs/2605.16467" target="_blank">
-        View arXiv Paper
-      </a>
-    </div>
-    <div class="publication-card">
-      <p class="year">2025</p>
+            <label class="slider">
+              <span>Hopping <i>t</i> <output id="tOut">1.00</output></span>
+              <input type="range" id="tSlider" min="0.4" max="1.6" step="0.01" value="1" />
+            </label>
+            <label class="slider" id="gapWrap">
+              <span>Mass gap <i>Δ</i> <output id="dOut">0.00</output></span>
+              <input type="range" id="dSlider" min="0" max="1.5" step="0.01" value="0" />
+            </label>
+            <label class="slider" id="tpWrap">
+              <span>Next-nearest <i>t′</i> <output id="tpOut">0.00</output></span>
+              <input type="range" id="tpSlider" min="-0.5" max="0.5" step="0.01" value="0" />
+            </label>
+          </div>
 
-      <h3>
-        Benchmarking Quantum Teleportation Schemes : A Noise-Based Comparative Approach (MSc. Project)
-      </h3>
+          <div class="readout">
+            <div><span>k<sub>x</sub></span><b id="rkx">—</b></div>
+            <div><span>k<sub>y</sub></span><b id="rky">—</b></div>
+            <div><span>E / t</span><b id="rE">—</b></div>
+          </div>
+          <p class="formula" id="labFormula">E<sub>±</sub>(k) = ± √( Δ² + t² |Σ<sub>δ</sub> e<sup>ik·δ</sup>|² )</p>
+        </div>
+        <div class="lab-stage">
+          <canvas id="bandCanvas" aria-label="Interactive 3D band structure"></canvas>
+          <span class="stage-tag">drag · hover</span>
+        </div>
+      </div>
+    </section>
 
-      <p>
-        This project investigates the impact of environmental noise on quantum teleportation by analyzing the average fidelity of different quantum states under Bit Flip, Amplitude Damping, Phase Flip, and Depolarizing noise models using a custom Python library, QPy, to simulate teleportation protocols and evaluate the robustness of quantum communication systems in noisy environments.
-      </p>
+    <!-- ============ GROUP ============ -->
+    <section id="group" class="block" data-section="group">
+      <div class="group panel reveal">
+        <div class="group-stage">
+          <canvas id="clusterCanvas" aria-label="Rotating 3D atomic cluster"></canvas>
+        </div>
+        <div class="group-copy">
+          <p class="kicker">03 — Research Group</p>
+          <h2><span class="grad">Teraqata</span> · IIT Madras</h2>
+          <p>
+            I'm a PhD scholar in <strong>Teraqata</strong>, the research group led by
+            <strong>Dr. Ayana Ghosh</strong> at IIT Madras. The group brings together
+            postdocs, PhD, master's students and interns from physics, materials science, engineering and
+            data science.
+          </p>
+          <div class="group-meta">
+            <div><span>Principal Investigator</span><b>Dr. Ayana Ghosh</b></div>
+            <div><span>My role</span><b>PhD Scholar</b></div>
+            <div><span>Institute</span><b>IIT Madras</b></div>
+          </div>
+          <a class="btn btn-primary" href="https://www.teraqata.com/group-members" target="_blank" rel="noopener">Meet the group <svg><use href="#i-ext"/></svg></a>
+        </div>
+      </div>
+    </section>
 
-      <a href="https://drive.google.com/file/d/1suR7MZl9j9NUOKO_jsiFDkmreNdwkqBG/view?usp=sharing" target="_blank">
-        View Document
-      </a>
-    </div>
-  </section>
+    <!-- ============ PUBLICATIONS ============ -->
+    <section id="publications" class="block" data-section="publications">
+      <div class="block-head reveal">
+        <p class="kicker">04 — Highlighted Work</p>
+        <h2>Publications &amp; <span class="grad">Projects</span></h2>
+      </div>
 
-  <!-- ACHIEVEMENTS -->
-  <section id="achievements">
-  <h2 class="section-title">Achievements</h2>
+      <div class="pubs">
+        <article class="pub tilt reveal">
+          <div class="pub-art art-a" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="pub-body">
+            <p class="pub-meta"><span class="pill mint">arXiv</span> 2026</p>
+            <h3>Beyond Bell Teleportation: Machine-Learned Adaptive Protocols</h3>
+            <p>Machine-learned adaptive teleportation protocols for noisy environments, with optimised strategies for enhancing fidelity.</p>
+            <a class="link-btn" href="https://arxiv.org/abs/2605.16467" target="_blank" rel="noopener">arXiv:2605.16467 <svg><use href="#i-ext"/></svg></a>
+          </div>
+        </article>
 
-  <div class="timeline">
+        <article class="pub tilt reveal">
+          <div class="pub-art art-b" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <div class="pub-body">
+            <p class="pub-meta"><span class="pill peach">MSc Project</span> 2025</p>
+            <h3>Benchmarking Quantum Teleportation Schemes: A Noise-Based Comparative Approach</h3>
+            <p>Average fidelity of teleported states under bit-flip, phase-flip, amplitude-damping and depolarising noise, simulated with QPy, a custom Python library I wrote.</p>
+            <a class="link-btn" href="https://drive.google.com/file/d/1suR7MZl9j9NUOKO_jsiFDkmreNdwkqBG/view?usp=sharing" target="_blank" rel="noopener">View document <svg><use href="#i-ext"/></svg></a>
+          </div>
+        </article>
+      </div>
+    </section>
 
-    <div class="timeline-item">
-      <h3>PhD Scholar in IIT Madras</h3>
-      <p>Research Pathway</p>
-    </div>
+    <!-- ============ ACHIEVEMENTS ============ -->
+    <section id="achievements" class="block" data-section="achievements">
+      <div class="block-head reveal">
+        <p class="kicker">05 — Milestones</p>
+        <h2>Achievements</h2>
+      </div>
 
-    <div class="timeline-item">
-      <h3>Calicut University MSc Physics First Rank Holder</h3>
-      <p>2025</p>
-    </div>
+      <ol class="timeline">
+        <li class="reveal" style="--c:var(--mint)">
+          <span class="t-year">2026</span>
+          <div class="t-card tilt"><h3>PhD Scholar, IIT Madras</h3><p>Joined the Teraqata group led by Dr. Ayana Ghosh.</p></div>
+        </li>
+        <li class="reveal" style="--c:var(--lemon)">
+          <span class="t-year">2025</span>
+          <div class="t-card tilt"><h3>First Rank Holder, MSc Physics</h3><p>University of Calicut.</p></div>
+        </li>
+        <li class="reveal" style="--c:var(--sky)">
+          <span class="t-year">2023–24</span>
+          <div class="t-card tilt"><h3>PG Merit Scholarship</h3><p>Awarded the University of Calicut PG Merit Scholarship for academic excellence.</p></div>
+        </li>
+        <li class="reveal" style="--c:var(--peach)">
+          <span class="t-year">2023</span>
+          <div class="t-card tilt"><h3>KTPI ART-3 Candidate</h3><p>Selected for the Active Research Training (ART 3) Programme of the Kerala Theoretical Physics Initiative.</p></div>
+        </li>
+        <li class="reveal" style="--c:var(--pink)">
+          <span class="t-year">2019–20</span>
+          <div class="t-card tilt"><h3>Kerala State Work Experience Fair</h3><p>Third position with A grade in Electronics.</p></div>
+        </li>
+      </ol>
+    </section>
 
-    <div class="timeline-item">
-      <h3>PG Merit Scholarship Award</h3>
-      <p>
-        Awarded the University of Calicut PG Merit Scholarship for academic
-        excellence during the academic year 2023–2024.
-      </p>
-    </div>
+    <!-- ============ QUOTE ============ -->
+    <section class="quote reveal">
+      <p class="q-mark">“</p>
+      <h2>More is different.</h2>
+      <p class="q-by">— P. W. Anderson, 1972</p>
+      <p class="q-note">The simple rules of the parts rarely tell you the behaviour of the whole. That gap is where I like to work.</p>
+    </section>
 
-    <div class="timeline-item">
-      <h3>KTPI ART 3 Candidate</h3>
-      <p>
-        Selected for the Active Research Training (ART 3) Programme conducted by
-        the Kerala Theoretical Physicist Initiative (KTPI) in 2023.
-      </p>
-    </div>
+    <!-- ============ CONTACT ============ -->
+    <section id="contact" class="block" data-section="contact">
+      <div class="contact panel reveal">
+        <div>
+          <p class="kicker">06 — Contact</p>
+          <h2>Let's <span class="grad">connect</span></h2>
+          <p>Open to collaborations, discussions on condensed matter &amp; ML, and outreach.</p>
+          <a class="mail-big" href="mailto:krishnajithcvinod7@gmail.com"><svg><use href="#i-mail"/></svg>krishnajithcvinod7@gmail.com</a>
+        </div>
+        <div class="socials">
+          <a href="https://github.com/Krishnajith-C-Vinod" target="_blank" rel="noopener" style="--c:var(--mint)"><svg><use href="#i-github"/></svg>GitHub</a>
+          <a href="https://in.linkedin.com/in/krishnajith-c-vinod" target="_blank" rel="noopener" style="--c:var(--sky)"><svg><use href="#i-linkedin"/></svg>LinkedIn</a>
+          <a href="https://www.instagram.com/krishnajith_c_vinod" target="_blank" rel="noopener" style="--c:var(--pink)"><svg><use href="#i-instagram"/></svg>Instagram</a>
+          <a href="https://youtube.com/KrishnajithCVinod" target="_blank" rel="noopener" style="--c:var(--coral)"><svg><use href="#i-youtube"/></svg>YouTube</a>
+        </div>
+      </div>
+    </section>
 
-    <div class="timeline-item">
-      <h3>Kerala State Work Experience Fair — Electronics</h3>
-      <p>
-        Secured Third Position with A Grade in the Electronics Competition at
-        the Kerala State Work Experience Fair (2019–2020).
-      </p>
-    </div>
+  </main>
 
-  </div>
-</section>
-
-  <!-- QUOTE -->
-  <section class="quote-section">
-    <h2>
-      “The future of computation may emerge not from faster machines,
-      but from deeper understanding of quantum reality.”
-    </h2>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact" class="glass-section">
-    <h2>Connect With Me</h2>
-
-    <div class="contact-links">
-      <a href="mailto:krishnajithcvinod7@gmail.com">Email</a>
-      <a href="https://www.instagram.com/krishnajith_c_vinod" target="_blank" >Instagram</a>
-
-      <a href="https://in.linkedin.com/in/krishnajith-c-vinod" target="_blank">
-        LinkedIn
-      </a>
-
-      <a href="https://github.com/Krishnajith-C-Vinod" target="_blank">
-        GitHub
-      </a>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <p>
-      © 2026 Krishnajith C Vinod • Portfolio
-    </p>
+  <footer class="footer">
+    <p>© <span id="year">2026</span> Krishnajith C Vinod · Kozhikode → Chennai</p>
+    <a href="#home">Back to top ↑</a>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- mobile menu -->
+  <div class="mobile-menu" hidden>
+    <a href="#home">Home</a><a href="#about">About</a><a href="#research">Research</a>
+    <a href="#bandlab">Band Lab</a><a href="#group">Group</a><a href="#publications">Publications</a>
+    <a href="#achievements">Achievements</a><a href="#contact">Contact</a>
+    <button class="theme-toggle-m">Toggle theme</button>
+  </div>
+
+  <!-- safety net: hide loader even if 3D fails to load -->
+  <script>
+    setTimeout(function () { document.body.classList.add('loaded'); }, 4000);
+  </script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
