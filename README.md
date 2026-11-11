@@ -3,7 +3,7 @@
 An interactive 3D portfolio built with plain HTML, CSS and JavaScript, using [Three.js](https://threejs.org/) for the 3D graphics.
 It covers my academic background, my research in **theoretical condensed matter physics** and **machine learning**, and a few physics demos you can play with.
 
-**Live site:** https://Krishnajith-C-Vinod.github.io/portfolio
+**Live site:** https://Krishnajith-C-Vinod.github.io/Portfolio
 
 ---
 
