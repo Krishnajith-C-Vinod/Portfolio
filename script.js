@@ -51,6 +51,7 @@ $$('[data-toggle]').forEach(btn => {
     'Theoretical Condensed Matter',
     'Machine Learning for Materials',
     'AI for Physics Discovery',
+    'Deep Learning for Physics',
     'Emergent Phenomena',
     'Computational Physics'
   ];
@@ -133,6 +134,7 @@ const PASTEL = {
     const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
     const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
     try { initBackground(THREE, RoomEnvironment); } catch (e) { console.warn('bg3d', e); }
+    try { initAINet(THREE, OrbitControls); } catch (e) { console.warn('ainet', e); }
     try { initBandLab(THREE, OrbitControls, RoomEnvironment); } catch (e) { console.warn('bandlab', e); }
     try { initCluster(THREE, OrbitControls, RoomEnvironment); } catch (e) { console.warn('cluster', e); }
   } catch (err) {
@@ -552,6 +554,420 @@ function initBackground(THREE, RoomEnvironment) {
 }
 
 /* =========================================================
+   NEURAL NETWORK LAB
+   A tiny MLP (tanh hidden layers, sigmoid output, Adam) trained live.
+   The 2D decision map works on its own; the 3D network view needs Three.js.
+   ========================================================= */
+const AILab = (function initAILab() {
+  const heat = $('#heatCanvas');
+  if (!heat) return null;
+  const ctx = heat.getContext('2d');
+  const spark = $('#lossSpark');
+  const sctx = spark.getContext('2d');
+  const off = document.createElement('canvas');
+  const G = 56;
+  off.width = off.height = G;
+  const octx = off.getContext('2d');
+  const img = octx.createImageData(G, G);
+
+  const COL = { 0: [255, 185, 138], 1: [124, 200, 255] };   // peach / sky
+
+  const st = {
+    data: 'phase', layers: 2, neurons: 6, lr: 0.03,
+    playing: !reduceMotion, epoch: 0, loss: NaN, acc: NaN, losses: [],
+    points: [], probe: { x: 0, y: 0 }, hovering: false, net: null, version: 0, acts: null, visible: false
+  };
+
+  const randn = () => { let u = 0, v = 0; while (!u) u = Math.random(); v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+
+  class MLP {
+    constructor(sizes) {
+      this.sizes = sizes; this.L = sizes.length - 1; this.t = 0;
+      this.W = []; this.b = []; this.gW = []; this.gb = []; this.mW = []; this.vW = []; this.mb = []; this.vb = [];
+      for (let l = 0; l < this.L; l++) {
+        const I = sizes[l], O = sizes[l + 1], sc = Math.sqrt(2 / (I + O));
+        this.W.push(Float32Array.from({ length: I * O }, () => randn() * sc));
+        this.b.push(new Float32Array(O));
+        [this.gW, this.mW, this.vW].forEach(arr => arr.push(new Float32Array(I * O)));
+        [this.gb, this.mb, this.vb].forEach(arr => arr.push(new Float32Array(O)));
+      }
+      this.a = sizes.map(n => new Float32Array(n));
+      this.d = sizes.map(n => new Float32Array(n));
+    }
+    forward(x, y) {
+      const { a, W, b, sizes, L } = this;
+      a[0][0] = x; a[0][1] = y;
+      for (let l = 0; l < L; l++) {
+        const I = sizes[l], O = sizes[l + 1], w = W[l], bb = b[l], ai = a[l], ao = a[l + 1];
+        for (let j = 0; j < O; j++) {
+          let z = bb[j];
+          const o = j * I;
+          for (let i = 0; i < I; i++) z += w[o + i] * ai[i];
+          ao[j] = l === L - 1 ? 1 / (1 + Math.exp(-z)) : Math.tanh(z);
+        }
+      }
+      return a[L][0];
+    }
+    step(pts, lr) {
+      const { L, sizes, W, a, d, gW, gb } = this;
+      gW.forEach(g => g.fill(0)); gb.forEach(g => g.fill(0));
+      let loss = 0, correct = 0;
+      for (const p of pts) {
+        const out = this.forward(p.x, p.y);
+        loss -= p.c ? Math.log(out + 1e-7) : Math.log(1 - out + 1e-7);
+        if ((out > 0.5) === (p.c === 1)) correct++;
+        d[L][0] = out - p.c;
+        for (let l = L - 1; l >= 0; l--) {
+          const I = sizes[l], O = sizes[l + 1], w = W[l], ai = a[l], dO = d[l + 1], g = gW[l], gbl = gb[l];
+          for (let j = 0; j < O; j++) {
+            gbl[j] += dO[j];
+            const o = j * I;
+            for (let i = 0; i < I; i++) g[o + i] += dO[j] * ai[i];
+          }
+          if (l > 0) {
+            const dI = d[l];
+            for (let i = 0; i < I; i++) {
+              let s = 0;
+              for (let j = 0; j < O; j++) s += w[j * I + i] * dO[j];
+              dI[i] = s * (1 - ai[i] * ai[i]);
+            }
+          }
+        }
+      }
+      const n = Math.max(pts.length, 1);
+      this.t++;
+      const b1 = 0.9, b2 = 0.999, c1 = 1 - b1 ** this.t, c2 = 1 - b2 ** this.t;
+      const adam = (P, Gr, M, V, decay) => {
+        for (let k = 0; k < P.length; k++) {
+          const g = Gr[k] / n + decay * P[k];
+          M[k] = b1 * M[k] + (1 - b1) * g;
+          V[k] = b2 * V[k] + (1 - b2) * g * g;
+          P[k] -= lr * (M[k] / c1) / (Math.sqrt(V[k] / c2) + 1e-8);
+        }
+      };
+      for (let l = 0; l < L; l++) { adam(W[l], gW[l], this.mW[l], this.vW[l], 1e-4); adam(this.b[l], gb[l], this.mb[l], this.vb[l], 0); }
+      return { loss: loss / n, acc: correct / n };
+    }
+  }
+
+  function makeData(name, n = 220) {
+    const pts = [];
+    const U = () => Math.random() * 2 - 1;
+    for (let k = 0; k < n; k++) {
+      let x = U(), y = U(), c;
+      if (name === 'phase') {
+        // ordered phase below a curved critical line T_c(h), with thermal noise near the boundary
+        const Tc = 0.42 - 0.95 * x * x;
+        c = y < Tc + randn() * 0.06 ? 1 : 0;
+      } else if (name === 'circle') {
+        c = Math.hypot(x, y) < 0.55 ? 1 : 0;
+      } else if (name === 'xor') {
+        if (Math.abs(x) < 0.06 || Math.abs(y) < 0.06) { k--; continue; }
+        c = x * y > 0 ? 1 : 0;
+      } else { // spiral
+        c = k % 2;
+        const r = (k / n) * 0.9 + 0.05, th = (k / n) * 3.2 * Math.PI + c * Math.PI;
+        x = r * Math.cos(th) + randn() * 0.03; y = r * Math.sin(th) + randn() * 0.03;
+      }
+      pts.push({ x, y, c });
+    }
+    return pts;
+  }
+
+  const LABELS = {
+    phase:  { x: 'field h →', y: 'temperature T →', b: 'Ordered', a: 'Disordered' },
+    circle: { x: 'x₁ →', y: 'x₂ →', b: 'Class A', a: 'Class B' },
+    xor:    { x: 'x₁ →', y: 'x₂ →', b: 'Class A', a: 'Class B' },
+    spiral: { x: 'x₁ →', y: 'x₂ →', b: 'Arm A', a: 'Arm B' }
+  };
+
+  function newNet() {
+    st.net = new MLP([2, ...Array(st.layers).fill(st.neurons), 1]);
+    st.epoch = 0; st.losses = []; st.loss = NaN; st.acc = NaN; st.version++;
+  }
+  function setData(name) {
+    st.data = name; st.points = makeData(name);
+    const L = LABELS[name];
+    $('#axX').textContent = L.x; $('#axY').textContent = L.y;
+    $('#lgB').textContent = L.b; $('#lgA').textContent = L.a;
+    newNet();
+  }
+
+  /* controls */
+  $$('#ailab .seg-btn').forEach(b => b.addEventListener('click', () => {
+    $$('#ailab .seg-btn').forEach(x => x.classList.toggle('active', x === b));
+    setData(b.dataset.data);
+  }));
+  const layersS = $('#layersSlider'), neuronsS = $('#neuronsSlider'), lrS = $('#lrSlider');
+  layersS.addEventListener('input', () => { st.layers = +layersS.value; $('#layersOut').textContent = st.layers; newNet(); });
+  neuronsS.addEventListener('input', () => { st.neurons = +neuronsS.value; $('#neuronsOut').textContent = st.neurons; newNet(); });
+  lrS.addEventListener('input', () => { st.lr = 10 ** +lrS.value; $('#lrOut').textContent = st.lr.toFixed(3); });
+  const playBtn = $('#aiPlay');
+  const syncPlay = () => { playBtn.textContent = st.playing ? 'Pause' : 'Train'; };
+  playBtn.addEventListener('click', () => { st.playing = !st.playing; syncPlay(); });
+  $('#aiReset').addEventListener('click', newNet);
+  $('#aiClear').addEventListener('click', () => { st.points = []; newNet(); });
+  syncPlay();
+
+  /* canvas interaction */
+  const toData = e => {
+    const r = heat.getBoundingClientRect();
+    return { x: ((e.clientX - r.left) / r.width) * 2 - 1, y: 1 - ((e.clientY - r.top) / r.height) * 2 };
+  };
+  heat.addEventListener('contextmenu', e => e.preventDefault());
+  heat.addEventListener('pointerdown', e => {
+    const p = toData(e);
+    st.points.push({ x: p.x, y: p.y, c: (e.button === 2 || e.shiftKey) ? 0 : 1 });
+  });
+  heat.addEventListener('pointermove', e => { st.probe = toData(e); st.hovering = true; });
+  heat.addEventListener('pointerleave', () => { st.hovering = false; });
+
+  /* sizing */
+  let W = 0, H = 0, SW = 0, SH = 0;
+  const dpr = Math.min(devicePixelRatio, 2);
+  function resize() {
+    W = heat.width = Math.max(1, heat.clientWidth * dpr);
+    H = heat.height = Math.max(1, heat.clientHeight * dpr);
+    SW = spark.width = Math.max(1, spark.clientWidth * dpr);
+    SH = spark.height = Math.max(1, spark.clientHeight * dpr);
+  }
+  new ResizeObserver(resize).observe(heat.parentElement);
+  new ResizeObserver(resize).observe(spark);
+  resize();
+
+  /* drawing */
+  function drawMap() {
+    const net = st.net, d = img.data;
+    for (let j = 0; j < G; j++) for (let i = 0; i < G; i++) {
+      const x = (i + 0.5) / G * 2 - 1, y = 1 - (j + 0.5) / G * 2;
+      const p = net.forward(x, y);
+      const k = (j * G + i) * 4;
+      let r = COL[0][0] + (COL[1][0] - COL[0][0]) * p;
+      let g = COL[0][1] + (COL[1][1] - COL[0][1]) * p;
+      let b = COL[0][2] + (COL[1][2] - COL[0][2]) * p;
+      const conf = Math.abs(p - 0.5) * 2;            // fade toward white at the boundary
+      const w = (1 - conf) * 0.55;
+      d[k] = r + (255 - r) * w; d[k + 1] = g + (255 - g) * w; d[k + 2] = b + (255 - b) * w; d[k + 3] = 255;
+    }
+    octx.putImageData(img, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalAlpha = 0.9;
+    ctx.drawImage(off, 0, 0, W, H);
+    ctx.globalAlpha = 1;
+
+    const R = 4.2 * dpr;
+    for (const p of st.points) {
+      const px = (p.x + 1) / 2 * W, py = (1 - p.y) / 2 * H;
+      ctx.beginPath(); ctx.arc(px, py, R, 0, Math.PI * 2);
+      const c = p.c ? [70, 160, 240] : [245, 130, 70];
+      ctx.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; ctx.fill();
+      ctx.lineWidth = 1.4 * dpr; ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.stroke();
+    }
+    // probe
+    const pr = st.probe, px = (pr.x + 1) / 2 * W, py = (1 - pr.y) / 2 * H;
+    ctx.beginPath(); ctx.arc(px, py, 9 * dpr, 0, Math.PI * 2);
+    ctx.lineWidth = 2 * dpr; ctx.strokeStyle = '#0a0f1f'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(px, py, 2.5 * dpr, 0, Math.PI * 2); ctx.fillStyle = '#0a0f1f'; ctx.fill();
+  }
+
+  function drawSpark() {
+    sctx.clearRect(0, 0, SW, SH);
+    const L = st.losses;
+    if (L.length < 2) return;
+    const lo = Math.log(Math.min(...L) + 1e-4), hi = Math.log(Math.max(...L) + 1e-4);
+    const grd = sctx.createLinearGradient(0, 0, SW, 0);
+    grd.addColorStop(0, '#6ff5c9'); grd.addColorStop(0.5, '#7cc8ff'); grd.addColorStop(1, '#ffb98a');
+    sctx.beginPath();
+    L.forEach((v, i) => {
+      const x = 8 * dpr + (i / (L.length - 1)) * (SW - 16 * dpr);
+      const y = SH - 6 * dpr - ((Math.log(v + 1e-4) - lo) / (hi - lo || 1)) * (SH - 26 * dpr);
+      i ? sctx.lineTo(x, y) : sctx.moveTo(x, y);
+    });
+    sctx.strokeStyle = grd; sctx.lineWidth = 2 * dpr; sctx.stroke();
+    sctx.fillStyle = root.dataset.theme === 'light' ? '#4d5a7d' : '#a7b3d1';
+    sctx.font = `${10 * dpr}px JetBrains Mono, monospace`;
+    sctx.fillText('training loss (log)', 10 * dpr, 14 * dpr);
+  }
+
+  const epochEl = $('#aiEpoch'), lossEl = $('#aiLoss'), accEl = $('#aiAcc'), probeEl = $('#probeOut');
+  let t0 = performance.now();
+  function loop(now) {
+    if (!st.visible || document.hidden) return;
+    if (st.playing && st.points.length) {
+      for (let k = 0; k < 4; k++) {
+        const r = st.net.step(st.points, st.lr);
+        st.loss = r.loss; st.acc = r.acc; st.epoch++;
+      }
+      if (st.epoch % 8 === 0) { st.losses.push(st.loss); if (st.losses.length > 300) st.losses.shift(); }
+    }
+    if (!st.hovering) {
+      const t = (now - t0) / 1000;
+      st.probe = { x: Math.cos(t * 0.45) * 0.62, y: Math.sin(t * 0.7) * 0.62 };
+    }
+    drawMap();
+    const out = st.net.forward(st.probe.x, st.probe.y);
+    st.acts = st.net.a.map(a => Float32Array.from(a));
+    probeEl.textContent = `P(${LABELS[st.data].b}) = ${out.toFixed(2)}`;
+    probeEl.classList.toggle('show', st.hovering);
+    epochEl.textContent = st.epoch;
+    lossEl.textContent = Number.isFinite(st.loss) ? st.loss.toFixed(3) : '—';
+    accEl.textContent = Number.isFinite(st.acc) ? (st.acc * 100).toFixed(1) + '%' : '—';
+    drawSpark();
+    requestAnimationFrame(loop);
+  }
+
+  new IntersectionObserver(([e]) => {
+    st.visible = e.isIntersecting;
+    if (st.visible) requestAnimationFrame(loop);
+  }, { threshold: 0.05 }).observe($('#ailab'));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && st.visible) requestAnimationFrame(loop); });
+
+  setData('phase');
+  st.acts = st.net.a.map(a => Float32Array.from(a));
+  return st;
+})();
+
+/* 3D view of the network: edges coloured by weight sign/size, nodes by activation */
+function initAINet(THREE, OrbitControls) {
+  if (!AILab) return;
+  const canvas = $('#netCanvas');
+  const stage = canvas.parentElement;
+  const renderer = makeRenderer(THREE, canvas);
+  renderer.toneMapping = THREE.NoToneMapping;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  camera.position.set(0, 1.2, 10);
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.enablePan = false; controls.enableZoom = false;
+  controls.autoRotate = !reduceMotion; controls.autoRotateSpeed = 0.9;
+  controls.minAzimuthAngle = -1.1; controls.maxAzimuthAngle = 1.1;
+  let dir = 1;
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+  const dl = new THREE.DirectionalLight(0xffffff, 1.2); dl.position.set(3, 5, 8); scene.add(dl);
+
+  const cPos = new THREE.Color(PASTEL.mint), cNeg = new THREE.Color(PASTEL.pink);
+  const cZero = new THREE.Color(0xdfe7f5);
+  const bgDark = new THREE.Color(0x111a33), bgLight = new THREE.Color(0xe8eefb);
+  const tmp = new THREE.Color();
+
+  let group = null, nodes = null, edges = null, nodeMap = [], version = -1;
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sv = new THREE.Vector3(), pv = new THREE.Vector3();
+
+  function build() {
+    if (group) {
+      scene.remove(group);
+      group.traverse(o => { o.geometry && o.geometry.dispose(); o.material && o.material.dispose(); });
+    }
+    const sizes = AILab.net.sizes;
+    group = new THREE.Group();
+    nodeMap = [];
+    const total = sizes.reduce((s, n) => s + n, 0);
+    const span = (sizes.length - 1) * 2.2;
+    sizes.forEach((n, l) => {
+      for (let k = 0; k < n; k++) {
+        nodeMap.push({ l, k, p: new THREE.Vector3(l * 2.2 - span / 2, (k - (n - 1) / 2) * 0.78, Math.sin(k * 1.7 + l) * 0.25) });
+      }
+    });
+    nodes = new THREE.InstancedMesh(
+      new THREE.SphereGeometry(0.2, 24, 14),
+      new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3, emissive: 0x223344, emissiveIntensity: 0.25 }),
+      total
+    );
+    nodeMap.forEach((nd, i) => { m4.compose(nd.p, q, sv.set(1, 1, 1)); nodes.setMatrixAt(i, m4); nodes.setColorAt(i, cZero); });
+    group.add(nodes);
+
+    const pos = [];
+    let base = 0;
+    const starts = sizes.map((n) => { const s = base; base += n; return s; });
+    for (let l = 0; l < sizes.length - 1; l++) {
+      for (let j = 0; j < sizes[l + 1]; j++) for (let i = 0; i < sizes[l]; i++) {
+        pos.push(...nodeMap[starts[l] + i].p.toArray(), ...nodeMap[starts[l + 1] + j].p.toArray());
+      }
+    }
+    const eg = new THREE.BufferGeometry();
+    eg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    eg.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(pos.length), 3));
+    edges = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.95 }));
+    group.add(edges);
+    scene.add(group);
+
+    fit.span = span; fit.height = Math.max(...sizes) * 0.78;
+    fitCamera();
+    version = AILab.version;
+  }
+  const fit = { span: 4, height: 4 };
+  function fitCamera() {
+    // distance needed so both the full width and height of the network fit the view
+    const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const dW = (fit.span / 2 + 0.45) / (tanV * camera.aspect);
+    const dH = (fit.height / 2 + 0.9) / tanV;
+    camera.position.setLength(Math.max(dW, dH));
+  }
+
+  function update() {
+    if (version !== AILab.version) build();
+    const net = AILab.net, sizes = net.sizes;
+    const bg = root.dataset.theme === 'light' ? bgLight : bgDark;
+    const col = edges.geometry.attributes.color.array;
+    let e = 0;
+    for (let l = 0; l < sizes.length - 1; l++) {
+      const W = net.W[l];
+      for (let k = 0; k < W.length; k++) {
+        const w = W[k];
+        const m = Math.min(1, Math.abs(w) / 1.6);
+        tmp.copy(bg).lerp(w >= 0 ? cPos : cNeg, 0.12 + 0.88 * m);
+        col[e++] = tmp.r; col[e++] = tmp.g; col[e++] = tmp.b;
+        col[e++] = tmp.r; col[e++] = tmp.g; col[e++] = tmp.b;
+      }
+    }
+    edges.geometry.attributes.color.needsUpdate = true;
+
+    const acts = AILab.acts;
+    const L = sizes.length - 1;
+    nodeMap.forEach((nd, i) => {
+      let a = acts && acts[nd.l] ? acts[nd.l][nd.k] : 0;
+      if (nd.l === L) a = a * 2 - 1;                // sigmoid output -> [-1, 1]
+      tmp.copy(cZero).lerp(a >= 0 ? cPos : cNeg, Math.min(1, Math.abs(a)));
+      nodes.setColorAt(i, tmp);
+      const s = 0.75 + 0.6 * Math.abs(a);
+      m4.compose(nd.p, q, sv.set(s, s, s));
+      nodes.setMatrixAt(i, m4);
+    });
+    nodes.instanceColor.needsUpdate = true;
+    nodes.instanceMatrix.needsUpdate = true;
+  }
+
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix();
+    if (group) fitCamera();
+  }
+  new ResizeObserver(resize).observe(stage);
+  resize();
+
+  let visible = false;
+  new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) requestAnimationFrame(loop); }, { threshold: 0.05 }).observe(stage);
+  function loop() {
+    if (!visible || document.hidden) return;
+    update();
+    // gentle back-and-forth sweep so the layers stay readable
+    const az = controls.getAzimuthalAngle();
+    if (controls.autoRotate) {
+      if (az > 1.0) dir = -1; else if (az < -1.0) dir = 1;
+      controls.autoRotateSpeed = 0.9 * dir;
+    }
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  }
+  controls.addEventListener('start', () => { controls.autoRotate = false; });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && visible) requestAnimationFrame(loop); });
+}
+
+/* =========================================================
    BAND STRUCTURE LAB
    ========================================================= */
 function initBandLab(THREE, OrbitControls, RoomEnvironment) {
@@ -758,8 +1174,8 @@ function initBandLab(THREE, OrbitControls, RoomEnvironment) {
     gapWrap.classList.toggle('disabled', state.model !== 'graphene');
     tpWrap.classList.toggle('disabled', state.model === 'triangular');
   }
-  $$('.seg-btn').forEach(b => b.addEventListener('click', () => {
-    $$('.seg-btn').forEach(x => x.classList.toggle('active', x === b));
+  $$('#bandlab .seg-btn').forEach(b => b.addEventListener('click', () => {
+    $$('#bandlab .seg-btn').forEach(x => x.classList.toggle('active', x === b));
     state.model = b.dataset.model;
     syncDisabled(); rebuild();
   }));
